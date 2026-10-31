@@ -1,0 +1,14 @@
+{
+  "methods": ["google", "apple", "x", "email"],
+  "headline": "Your AI workforce. Under your command.",
+  "subtitle": "Sign in securely to your private KEVIN AI OFFICE.",
+  "style": {
+    "mode": "dark",
+    "accentColor": "#d8ad55",
+    "backgroundColor": "#09090b",
+    "panelColor": "#141417",
+    "textColor": "#f4f1e9",
+    "fontFamily": "DM Sans, system-ui, sans-serif",
+    "borderRadius": 14
+  }
+}
