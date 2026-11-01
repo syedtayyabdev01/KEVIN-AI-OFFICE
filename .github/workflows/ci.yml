@@ -1,0 +1,33 @@
+name: KEVIN AI OFFICE CI
+on:
+  push:
+    branches: ["apollo-foundation", "main"]
+  pull_request:
+    branches: ["main"]
+permissions:
+  contents: read
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm run build
+  local-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: cargo fmt --manifest-path apps/kevin-agent/Cargo.toml -- --check
+      - run: cargo clippy --manifest-path apps/kevin-agent/Cargo.toml --all-targets -- -D warnings
+      - run: cargo test --manifest-path apps/kevin-agent/Cargo.toml
