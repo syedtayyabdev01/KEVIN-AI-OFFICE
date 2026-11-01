@@ -34,7 +34,7 @@ KEVIN_AI_API_KEY=your-provider-api-key
 KEVIN_AI_WORKERS=1
 ```
 
-For Ollama, use:
+For Ollama, install Ollama, pull a small model with `ollama pull qwen2.5:3b`, and keep the Ollama service running. Use:
 
 ```dotenv
 KEVIN_AI_BASE_URL=http://127.0.0.1:11434/v1
