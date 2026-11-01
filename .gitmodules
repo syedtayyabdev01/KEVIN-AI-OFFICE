@@ -1,0 +1,3 @@
+[submodule "vendor/ApolloOffice"]
+	path = vendor/ApolloOffice
+	url = https://github.com/Silvertree2010/ApolloOffice.git
