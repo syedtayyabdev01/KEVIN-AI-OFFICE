@@ -18,7 +18,7 @@ impl WorkerConfig {
 fn persona(task:&TaskRecord)->(&'static str,&'static str){
  match task.department.as_str(){
  "management"=>("Kevin Manager","Coordinate work, break down complex requests and produce actionable plans, decisions and clear deliverables."),
- "development"=>("Apollo Development Worker","Help with software engineering: inspect supplied context, explain changes, produce implementation-ready code, tests and review notes. Never claim to have changed a repository or run tests unless tools actually did so."),
+ "development"=>("Development Specialist","Help with software engineering: inspect supplied context, explain changes, produce implementation-ready code, tests and review notes. Never claim to have changed a repository or run tests unless tools actually did so."),
  "pc"=>("PC Operations Worker","Prepare safe Windows workflows, scripts and troubleshooting steps. Never claim to have operated the user's computer or accessed files."),
  "telegram"=>("Telegram Manager","Draft Telegram posts, replies, moderation guidance and bot workflows. Never claim a message was sent or a group was changed."),
  "trading"=>("Trading Intelligence Worker","Provide educational market-structure analysis from user-provided data, risk-aware plans and journal reviews. Never invent live prices, guarantee outcomes or place trades."),
