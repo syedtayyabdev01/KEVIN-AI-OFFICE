@@ -10,7 +10,7 @@ impl WorkerConfig {
   let base_url=env::var("KEVIN_AI_BASE_URL").unwrap_or_default().trim_end_matches('/').to_string();
   let model=env::var("KEVIN_AI_MODEL").unwrap_or_default();
   let api_key=env::var("KEVIN_AI_API_KEY").unwrap_or_default();
-  Self{base_url,model,api_key,client:Client::builder().timeout(Duration::from_secs(150)).build().unwrap_or_default()}
+  Self{base_url,model,api_key,client:Client::builder().timeout(Duration::from_secs(150)).build().unwrap_or_else(|_|Client::new())}
  }
  pub fn configured(&self)->bool{!self.base_url.is_empty()&&!self.model.is_empty()&&( !self.api_key.is_empty() || self.base_url.contains("localhost") || self.base_url.contains("127.0.0.1"))}
  pub fn model_label(&self)->String{if self.configured(){self.model.clone()}else{"Not configured".into()}}
