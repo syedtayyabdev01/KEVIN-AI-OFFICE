@@ -12,12 +12,12 @@ use tower_http::cors::CorsLayer;
 fn default_department()->String{"management".into()}fn default_priority()->String{"normal".into()}
 fn agents(ready:bool,running:Option<String>)->Vec<Agent>{let status=|department:&str|if running.as_deref()==Some(department){"working"}else if ready{"ready"}else{"not_connected"};vec![
 Agent{id:"kevin-manager",name:"Kevin Manager",department:"management",description:"Plans requests and routes work.",status:status("management").into(),permission:"plan-and-route"},
-Agent{id:"apollo-development",name:"Apollo Development",department:"development",description:"Verified repository work through ApolloOffice.",status:status("development").into(),permission:"repository-scoped"},
-Agent{id:"pc-operator",name:"PC Operator",department:"pc",description:"Windows apps, files and browser workflows.",status:status("pc").into(),permission:"approval-required"},
-Agent{id:"telegram-manager",name:"Telegram Manager",department:"telegram",description:"Telegram messages, groups and moderation.",status:status("telegram").into(),permission:"draft-first"},
-Agent{id:"tradingview-agent",name:"TradingView Agent",department:"trading",description:"Charts, alerts and trading journal.",status:status("trading").into(),permission:"read-only"},
-Agent{id:"news-intelligence",name:"News Intelligence",department:"news",description:"Source-backed monitoring and research.",status:status("news").into(),permission:"read-only"},
-Agent{id:"student-manager",name:"Student Manager",department:"students",description:"Students, courses, batches, attendance and fees.",status:status("students").into(),permission:"approval-required"}]}
+Agent{id:"apollo-development",name:"Apollo Development",department:"development",description:"AI coding deliverables; repository execution requires the Apollo adapter.",status:status("development").into(),permission:"repository-scoped"},
+Agent{id:"pc-operator",name:"PC Operator",department:"pc",description:"Windows workflows and scripts; device-control adapter not connected.",status:status("pc").into(),permission:"approval-required"},
+Agent{id:"telegram-manager",name:"Telegram Manager",department:"telegram",description:"Telegram drafts and workflows; message-sending adapter not connected.",status:status("telegram").into(),permission:"draft-first"},
+Agent{id:"tradingview-agent",name:"TradingView Agent",department:"trading",description:"Risk-aware analysis; live market and broker adapters not connected.",status:status("trading").into(),permission:"read-only"},
+Agent{id:"news-intelligence",name:"News Intelligence",department:"news",description:"Research synthesis; live source feeds not connected.",status:status("news").into(),permission:"read-only"},
+Agent{id:"student-manager",name:"Student Manager",department:"students",description:"Academy plans and reports; student database adapter not connected.",status:status("students").into(),permission:"approval-required"}]}
 fn authorized(h:&HeaderMap,t:&str)->bool{let Some(v)=h.get(header::AUTHORIZATION).and_then(|v|v.to_str().ok())else{return false};let Some(c)=v.strip_prefix("Bearer ")else{return false};bool::from(c.as_bytes().ct_eq(t.as_bytes()))}
 fn err(s:StatusCode,m:impl Into<String>)->(StatusCode,Json<ApiError>){(s,Json(ApiError{error:m.into()}))}
 fn auth(h:&HeaderMap,t:&str)->Result<(),(StatusCode,Json<ApiError>)>{if authorized(h,t){Ok(())}else{Err(err(StatusCode::UNAUTHORIZED,"A valid local bearer token is required."))}}
