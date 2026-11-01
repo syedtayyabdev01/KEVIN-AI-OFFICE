@@ -52,7 +52,8 @@ cd KEVIN-AI-OFFICE
 git submodule update --init --recursive
 npm install
 Copy-Item .env.example .env
-# Edit .env with your provider URL, model, API key and a random local token.
+# Default is local Ollama + qwen2.5:3b. Install Ollama and run: ollama pull qwen2.5:3b
+# Edit .env and set a random KEVIN_AGENT_TOKEN (32+ chars).
 ```
 
 In one PowerShell terminal, load `.env` and start the local agent:
