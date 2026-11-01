@@ -66,7 +66,7 @@ To avoid installing Rust, download `kevin-local-agent.exe` from the **KEVIN Wind
 
 ```powershell
 Get-Content .env | ForEach-Object {
-  if ($_ -match '^\s*([^#=]+)\\s*=\\s*(.*)\\s*$') {
+  if ($_ -match '^\s*([^#=]+)\s*=\s*(.*)\s*$') {
     [Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
   }
 }
