@@ -31,6 +31,7 @@ KEVIN_AGENT_TOKEN=your-random-token-at-least-32-characters
 KEVIN_AI_BASE_URL=https://api.openai.com/v1
 KEVIN_AI_MODEL=gpt-4o-mini
 KEVIN_AI_API_KEY=your-provider-api-key
+KEVIN_AI_WORKERS=1
 ```
 
 For Ollama, use:
