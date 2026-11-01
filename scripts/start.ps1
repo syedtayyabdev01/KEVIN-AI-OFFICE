@@ -16,8 +16,53 @@ Get-Content $EnvFile | ForEach-Object {
     }
 }
 
+if ([string]::IsNullOrWhiteSpace($env:KEVIN_AGENT_TOKEN)) {
+    $Rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    $Bytes = New-Object byte[] 48
+    $Rng.GetBytes($Bytes)
+    $GeneratedToken = [Convert]::ToBase64String($Bytes)
+    $Rng.Dispose()
+    $EnvContent = Get-Content $EnvFile -Raw
+    $EnvContent = [regex]::Replace($EnvContent, '(?m)^KEVIN_AGENT_TOKEN=.*
+if (-not $env:KEVIN_AI_BASE_URL -or -not $env:KEVIN_AI_MODEL) {
+    throw "Set KEVIN_AI_BASE_URL and KEVIN_AI_MODEL in .env. Ollama example: http://127.0.0.1:11434/v1 with qwen2.5:3b."
+}
+if ($env:KEVIN_AI_BASE_URL -like "http://127.0.0.1:11434*") {
+    if (-not (Get-Command ollama -ErrorAction SilentlyContinue)) {
+        throw "Ollama is not installed. Install Ollama, reopen PowerShell, then run: ollama pull $env:KEVIN_AI_MODEL"
+    }
+    $InstalledModels = (ollama list 2>$null | Out-String)
+    if ($InstalledModels -notmatch [regex]::Escape($env:KEVIN_AI_MODEL)) {
+        throw "Model $env:KEVIN_AI_MODEL is not downloaded. Run: ollama pull $env:KEVIN_AI_MODEL"
+    }
+    try { $null = Invoke-RestMethod "http://127.0.0.1:11434/api/tags" -TimeoutSec 3 }
+    catch { throw "Ollama is installed but not responding. Start Ollama, then retry." }
+}
+if (-not (Get-Command npm.cmd -ErrorAction SilentlyContinue)) { throw "Node.js/npm is missing. Install Node.js 20+ then retry." }
+
+Set-Location $Root
+$AgentExe = Join-Path $Root "kevin-local-agent.exe"
+if (-not (Test-Path $AgentExe)) {
+    $AgentExe = Join-Path $Root "apps/kevin-agent/target/release/kevin-local-agent.exe"
+}
+if (Test-Path $AgentExe) {
+    $AgentCommand = "Set-Location '$Root'; & '$AgentExe'"
+} else {
+    if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) { throw "Rust/Cargo is missing and no prebuilt kevin-local-agent.exe was found. Install Rust stable or download the Windows build artifact and place kevin-local-agent.exe in the project root." }
+    $AgentCommand = "Set-Location '$Root'; cargo run --manifest-path 'apps/kevin-agent/Cargo.toml'"
+}
+$DashboardCommand = "Set-Location '$Root'; npm.cmd run dev"
+Start-Process powershell.exe -ArgumentList @("-NoExit", "-Command", $AgentCommand)
+Start-Sleep -Seconds 2
+Start-Process powershell.exe -ArgumentList @("-NoExit", "-Command", $DashboardCommand)
+Write-Host "KEVIN AI OFFICE is starting. Open http://localhost:5173 and connect with the token stored in .env." -ForegroundColor Green
+, "KEVIN_AGENT_TOKEN=$GeneratedToken")
+    Set-Content -Path $EnvFile -Value $EnvContent -NoNewline
+    $env:KEVIN_AGENT_TOKEN = $GeneratedToken
+    Write-Host "Generated a unique local agent token and saved it in .env." -ForegroundColor Green
+}
 if ($env:KEVIN_AGENT_TOKEN.Length -lt 32) {
-    throw "KEVIN_AGENT_TOKEN must be at least 32 characters. Edit .env first."
+    throw "KEVIN_AGENT_TOKEN must be at least 32 characters."
 }
 if (-not $env:KEVIN_AI_BASE_URL -or -not $env:KEVIN_AI_MODEL) {
     throw "Set KEVIN_AI_BASE_URL and KEVIN_AI_MODEL in .env. Ollama example: http://127.0.0.1:11434/v1 with qwen2.5:3b."
