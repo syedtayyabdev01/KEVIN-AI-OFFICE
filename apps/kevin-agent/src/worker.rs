@@ -42,10 +42,10 @@ async fn execute(cfg:&WorkerConfig,task:&TaskRecord)->Result<String,String>{
  if content.is_empty(){return Err("AI provider returned an empty response.".into())}
  Ok(content)
 }
-pub async fn run(store:Store,cfg:Arc<WorkerConfig>){
+pub async fn run(store:Store,cfg:Arc<WorkerConfig>,worker_id:String){
  loop{
   if !cfg.configured(){tokio::time::sleep(Duration::from_secs(4)).await;continue}
-  match store.claim_next_task("kevin-ai-worker"){
+  match store.claim_next_task(&worker_id){
    Ok(Some(task))=>{
     let id=task.id.clone();
     match execute(&cfg,&task).await{
