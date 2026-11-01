@@ -58,3 +58,24 @@ pub async fn run(store:Store,cfg:Arc<WorkerConfig>){
   }
  }
 }
+
+#[cfg(test)]
+mod tests {
+ use super::*;
+ use axum::{routing::post,Json,Router};
+ async fn fake_completion(Json(_request):Json<Value>)->Json<Value>{
+  Json(json!({"choices":[{"message":{"content":"Worker completed a real test task."}}]}))
+ }
+ #[tokio::test]
+ async fn worker_calls_openai_compatible_endpoint_and_returns_output(){
+  let listener=tokio::net::TcpListener::bind(("127.0.0.1",0)).await.unwrap();
+  let address=listener.local_addr().unwrap();
+  let app=Router::new().route("/v1/chat/completions",post(fake_completion));
+  tokio::spawn(async move{let _=axum::serve(listener,app).await;});
+  let cfg=WorkerConfig{base_url:format!("http://{address}/v1"),model:"test-model".into(),api_key:String::new(),client:Client::new()};
+  assert!(cfg.configured());
+  let task=TaskRecord{id:"test-id".into(),title:"Prepare a test".into(),description:"Return a useful test result".into(),department:"management".into(),priority:"normal".into(),status:"running".into(),approval_required:false,created_at:0,updated_at:0,result:None,worker:Some("test-worker".into())};
+  let result=execute(&cfg,&task).await.unwrap();
+  assert_eq!(result,"Worker completed a real test task.");
+ }
+}
