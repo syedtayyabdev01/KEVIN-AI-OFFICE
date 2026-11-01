@@ -4,63 +4,88 @@ Local-first AI operations office built around the original [ApolloOffice](https:
 
 ## Architecture
 
-- ApolloOffice remains the specialist software-engineering engine and is pinned at \`vendor/ApolloOffice\` as a Git submodule.
-- KEVIN Local Agent is a separate Windows-side control plane with SQLite task persistence, approvals and capability reporting.
+- ApolloOffice remains the specialist software-engineering engine and is pinned at `vendor/ApolloOffice` as a Git submodule.
+- KEVIN Local Agent is a separate Windows-side control plane with SQLite task persistence, approvals and a background AI worker.
 - KEVIN Dashboard is a React/Vite UI connected to the local agent.
-- PC, Telegram, TradingView, News and Student Academy are separate adapters. Disconnected adapters are visibly marked unavailable.
+- Department workers currently share a configured OpenAI-compatible model for text-based deliverables. Device control, Telegram sending, live TradingView/broker data, live news feeds and student/payment database writes still require their own adapters.
 
-## Implemented in this foundation
+## Implemented
 
-- Rust/Axum local API bound to \`127.0.0.1:47310\`.
-- Bearer-token protection for agent and task endpoints.
-- SQLite task persistence.
-- Task creation starts in \`awaiting_approval\`.
-- Owner approval transitions the record to \`queued\`.
-- Dashboard polls the real local API and shows adapter status.
-- CI workflow for dashboard typecheck/build and Rust fmt/clippy/tests.
+- Rust/Axum local API bound to `127.0.0.1:47310`, protected by a local bearer token.
+- SQLite task persistence and backward-compatible result/worker columns.
+- Owner approval flow: `awaiting_approval → queued → running → completed/failed`.
+- Background worker polls approved tasks, calls a configured OpenAI-compatible chat-completions endpoint, and persists the real response or provider error.
+- Department-specific worker instructions for Management, Development, PC Operations, Telegram, Trading Intelligence, News and Student Academy.
+- Live worker readiness/working states and completed-result viewer in the dashboard.
+- Responsive dashboard navigation, motion, hover/focus states and reduced-motion support.
+- CI for dashboard typecheck/build and Rust fmt/clippy/tests.
 
-## Not implemented yet
+## Provider configuration
 
-Apollo process lifecycle integration, Windows UI automation, Telegram operations, TradingView integration, live news feeds, Student Academy CRUD, and multi-provider orchestration. These must be implemented as real adapters before being shown as connected. A queued task is not evidence of execution.
+The worker accepts any provider that implements the OpenAI-compatible `/chat/completions` endpoint, including OpenAI-compatible gateways and Ollama.
 
-## Requirements
+Copy `.env.example` to `.env`, then set:
 
-- Node.js 20+
-- Rust stable toolchain
-- Git with submodule support
+```dotenv
+KEVIN_AGENT_TOKEN=your-random-token-at-least-32-characters
+KEVIN_AI_BASE_URL=https://api.openai.com/v1
+KEVIN_AI_MODEL=gpt-4o-mini
+KEVIN_AI_API_KEY=your-provider-api-key
+```
+
+For Ollama, use:
+
+```dotenv
+KEVIN_AI_BASE_URL=http://127.0.0.1:11434/v1
+KEVIN_AI_MODEL=qwen2.5:3b
+KEVIN_AI_API_KEY=
+```
+
+Make sure the selected Ollama model is downloaded and Ollama is running. Never commit `.env` or paste provider keys into the dashboard.
 
 ## Clone and run (PowerShell)
 
-\`\`\`powershell
+```powershell
 git clone --branch apollo-foundation https://github.com/syedtayyabdev01/KEVIN-AI-OFFICE.git
 cd KEVIN-AI-OFFICE
 git submodule update --init --recursive
 npm install
-npm run typecheck
-npm run build
-\`\`\`
+Copy-Item .env.example .env
+# Edit .env with your provider URL, model, API key and a random local token.
+```
 
-In a second PowerShell terminal:
+In one PowerShell terminal, load `.env` and start the local agent:
 
-\`\`\`powershell
-$env:KEVIN_AGENT_TOKEN = [Convert]::ToBase64String((1..48 | ForEach-Object { Get-Random -Maximum 256 } | ForEach-Object { [byte]$_ }))
+```powershell
+Get-Content .env | ForEach-Object {
+  if ($_ -match '^\\s*([^#=]+)\\s*=\\s*(.*)\\s*$') {
+    [Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
+  }
+}
 cargo run --manifest-path apps/kevin-agent/Cargo.toml
-\`\`\`
+```
 
-Open the Vite URL printed by \`npm run dev\` (normally \`http://localhost:5173\`). Paste the same local token into Runtime Connection.
+In a second terminal:
+
+```powershell
+npm run dev
+```
+
+Open `http://localhost:5173` and paste the same `KEVIN_AGENT_TOKEN` into Runtime Connection. Create a task, approve it, and watch it move through Running to Completed. Open the result to inspect the worker's actual response.
 
 ## Verification
 
-\`\`\`powershell
+```powershell
 cargo fmt --manifest-path apps/kevin-agent/Cargo.toml -- --check
+cargo clippy --manifest-path apps/kevin-agent/Cargo.toml --all-targets -- -D warnings
 cargo test --manifest-path apps/kevin-agent/Cargo.toml
 npm run typecheck
 npm run build
-\`\`\`
+```
 
-## Security boundaries
+## Security boundaries and limitations
 
-The local agent binds to loopback only. It has no arbitrary shell endpoint. Task creation persists intent; approval only queues it. It does not click UI controls, send messages, place trades, or change student/payment records. Each future adapter needs a narrow capability contract, scoped permissions and audit evidence. Do not expose the local API through a public tunnel.
+The local agent binds to loopback only. It has no arbitrary shell endpoint. The generic AI worker produces text deliverables; it does not click UI controls, send Telegram messages, place trades, modify student/payment records, or claim repository changes. Those actions need dedicated scoped adapters, explicit approvals and auditable evidence. Do not expose the local API through a public tunnel.
 
 ## Apollo license
 
