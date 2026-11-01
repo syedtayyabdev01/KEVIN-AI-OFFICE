@@ -62,7 +62,7 @@ The Windows launcher generates a local token if needed, validates the Ollama mod
 .\scripts\start.ps1
 ```
 
-It uses a prebuilt `kevin-local-agent.exe` if one is present in the project root; otherwise it builds/runs with Cargo. To start manually, load `.env` and run:
+To avoid installing Rust, download `kevin-local-agent.exe` from the **KEVIN Windows Agent Build** workflow artifact and place it in the project root before running the launcher. If no prebuilt binary is present, it builds/runs with Cargo. To start manually, load `.env` and run:
 
 ```powershell
 Get-Content .env | ForEach-Object {
