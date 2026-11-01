@@ -12,7 +12,7 @@ use tower_http::cors::CorsLayer;
 fn default_department()->String{"management".into()}fn default_priority()->String{"normal".into()}
 fn agents(ready:bool,running:Vec<String>)->Vec<Agent>{let status=|department:&str|if running.iter().any(|item|item==department){"working"}else if ready{"ready"}else{"not_connected"};vec![
 Agent{id:"kevin-manager",name:"Kevin Manager",department:"management",description:"Plans requests and routes work.",status:status("management").into(),permission:"plan-and-route"},
-Agent{id:"apollo-development",name:"Apollo Development",department:"development",description:"AI coding deliverables; repository execution requires the Apollo adapter.",status:status("development").into(),permission:"repository-scoped"},
+Agent{id:"apollo-development",name:"Development Specialist",department:"development",description:"AI coding deliverables; Apollo repository pipeline adapter is not connected.",status:status("development").into(),permission:"repository-scoped"},
 Agent{id:"pc-operator",name:"PC Operator",department:"pc",description:"Windows workflows and scripts; device-control adapter not connected.",status:status("pc").into(),permission:"approval-required"},
 Agent{id:"telegram-manager",name:"Telegram Manager",department:"telegram",description:"Telegram drafts and workflows; message-sending adapter not connected.",status:status("telegram").into(),permission:"draft-first"},
 Agent{id:"tradingview-agent",name:"TradingView Agent",department:"trading",description:"Risk-aware analysis; live market and broker adapters not connected.",status:status("trading").into(),permission:"read-only"},
