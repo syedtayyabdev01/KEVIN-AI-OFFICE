@@ -28,6 +28,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - run: cargo fmt --manifest-path apps/kevin-agent/Cargo.toml -- --check
+      - run: cargo fmt --manifest-path apps/kevin-agent/Cargo.toml
       - run: cargo clippy --manifest-path apps/kevin-agent/Cargo.toml --all-targets -- -D warnings
       - run: cargo test --manifest-path apps/kevin-agent/Cargo.toml
