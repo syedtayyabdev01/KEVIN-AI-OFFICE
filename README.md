@@ -79,7 +79,7 @@ In a second terminal:
 npm run dev
 ```
 
-Open `http://localhost:5173` and paste the `KEVIN_AGENT_TOKEN` saved in `.env` into Runtime Connection. Then run ` .\\scripts\\worker-smoke-test.ps1` in PowerShell. It creates and approves a test task, waits for the AI provider, and prints the real persisted worker response. The dashboard also shows the Running → Completed lifecycle and result.
+Open `http://localhost:5173` and paste the `KEVIN_AGENT_TOKEN` saved in `.env` into Runtime Connection. Then run `.\scripts\worker-smoke-test.ps1` in PowerShell. It creates and approves a test task, waits for the AI provider, and prints the real persisted worker response. The dashboard also shows the Running → Completed lifecycle and result.
 
 ## Verification
 
