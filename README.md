@@ -53,14 +53,20 @@ git submodule update --init --recursive
 npm install
 Copy-Item .env.example .env
 # Default is local Ollama + qwen2.5:3b. Install Ollama and run: ollama pull qwen2.5:3b
-# Edit .env and set a random KEVIN_AGENT_TOKEN (32+ chars).
+# The start script generates a secure local token if it is blank.
 ```
 
-In one PowerShell terminal, load `.env` and start the local agent:
+The Windows launcher generates a local token if needed, validates the Ollama model and starts both the local agent and dashboard:
+
+```powershell
+.\scripts\start.ps1
+```
+
+It uses a prebuilt `kevin-local-agent.exe` if one is present in the project root; otherwise it builds/runs with Cargo. To start manually, load `.env` and run:
 
 ```powershell
 Get-Content .env | ForEach-Object {
-  if ($_ -match '^\\s*([^#=]+)\\s*=\\s*(.*)\\s*$') {
+  if ($_ -match '^\s*([^#=]+)\\s*=\\s*(.*)\\s*$') {
     [Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
   }
 }
